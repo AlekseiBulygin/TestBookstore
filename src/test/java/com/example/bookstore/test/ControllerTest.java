@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.containsString;
 import com.example.bookstore.objects.*;
 import com.example.bookstore.repo.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
@@ -19,11 +19,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,12 +36,6 @@ public class ControllerTest {
     BookRepository repository;
 
     @Autowired
-    ShelfRepository shelfRepository;
-
-    @Autowired
-    RackRepository rackRepository;
-
-    @Autowired
     private BookstoreController controller;
 
     @Autowired
@@ -52,106 +44,6 @@ public class ControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @BeforeAll
-    public void initRepo() {
-        RackEntity rack1 = new RackEntity();
-        RackEntity rack2 = new RackEntity();
-
-        ShelfEntity shelf1 = new ShelfEntity(1);
-        ShelfEntity shelf2 = new ShelfEntity(2);
-        ShelfEntity shelf3 = new ShelfEntity(3);
-
-        ShelfEntity shelf4 = new ShelfEntity(1);
-        ShelfEntity shelf5 = new ShelfEntity(2);
-        ShelfEntity shelf6 = new ShelfEntity(3);
-
-        BookEntity book11 = new BookEntity("War and peace");
-        BookEntity book12 = new BookEntity("Idiot");
-        BookEntity book13 = new BookEntity("Anna Karenina");
-        BookEntity book14 = new BookEntity("Crime and punishment");
-        BookEntity book15 = new BookEntity("Eugene Onegin");
-
-        book11.setShelf(shelf1);
-        book12.setShelf(shelf1);
-        book13.setShelf(shelf2);
-        book14.setShelf(shelf2);
-        book15.setShelf(shelf3);
-
-        ArrayList<BookEntity> bookList1 = new ArrayList<>();
-        ArrayList <BookEntity> bookList2 = new ArrayList<>();
-        ArrayList <BookEntity> bookList3 = new ArrayList<>();
-        bookList1.add(book11);
-        bookList1.add(book12);
-        bookList2.add(book13);
-        bookList2.add(book14);
-        bookList3.add(book15);
-
-        shelf1.setBooks(bookList1);
-        shelf2.setBooks(bookList2);
-        shelf3.setBooks(bookList3);
-
-        shelf1.setRack(rack1);
-        shelf2.setRack(rack1);
-        shelf3.setRack(rack1);
-
-        ArrayList <ShelfEntity> shelvesList = new ArrayList<>();
-        shelvesList.add(shelf1);
-        shelvesList.add(shelf2);
-        shelvesList.add(shelf3);
-        rack1.setShelves(shelvesList);
-
-        BookEntity book21 = new BookEntity("The Great Gatsby");
-        BookEntity book22 = new BookEntity("The Lord of the Rings");
-        BookEntity book23 = new BookEntity("1984");
-        BookEntity book24 = new BookEntity("Dorian Grey");
-        BookEntity book25 = new BookEntity("Fahrenheit 451");
-
-        book21.setShelf(shelf4);
-        book22.setShelf(shelf4);
-        book23.setShelf(shelf5);
-        book24.setShelf(shelf6);
-        book25.setShelf(shelf6);
-
-        ArrayList <BookEntity> bookList4 = new ArrayList<>();
-        ArrayList <BookEntity> bookList5 = new ArrayList<>();
-        ArrayList <BookEntity> bookList6 = new ArrayList<>();
-        bookList4.add(book21);
-        bookList4.add(book22);
-        bookList5.add(book23);
-        bookList6.add(book24);
-        bookList6.add(book25);
-
-        shelf4.setBooks(bookList4);
-        shelf4.setRack(rack2);
-        shelf5.setBooks(bookList5);
-        shelf5.setRack(rack2);
-        shelf6.setBooks(bookList6);
-        shelf6.setRack(rack2);
-
-        ArrayList <ShelfEntity> shelvesList2 = new ArrayList<>();
-        shelvesList2.add(shelf4);
-        shelvesList2.add(shelf5);
-        shelvesList2.add(shelf6);
-
-        rack2.setShelves(shelvesList2);
-
-        rackRepository.save(rack1);
-        shelfRepository.saveAll(shelvesList);
-        repository.save(book11);
-        repository.save(book12);
-        repository.save(book13);
-        repository.save(book14);
-        repository.save(book15);
-
-        rackRepository.save(rack2);
-        shelfRepository.saveAll(shelvesList2);
-        repository.save(book21);
-        repository.save(book22);
-        repository.save(book23);
-        repository.save(book24);
-        repository.save(book25);
-    }
-
     @Test
     public void test() throws Exception {
         assertThat(controller).isNotNull();
@@ -159,19 +51,20 @@ public class ControllerTest {
 
     @Test
     public void showBooks() throws Exception {
-        Iterator<BookEntity> iterator = repository.findAll().iterator();
-        ArrayList<BookEntity> books = new ArrayList<>();
-        iterator.forEachRemaining(books::add);
+        Iterable<BookEntity> books = repository.findAll();
 
-        String newString = "[";
-
+        ArrayList<String> strBooks = new ArrayList<>();
         for( BookEntity b: books) {
-            newString = newString.concat(b.toString() + ",");
+            strBooks.add(b.toString());
         }
+
+        String newString = String.join(",", strBooks);
+        newString = String.format("[%s]", newString);
+
         MvcResult res = this.mockMvc.perform(get("/books"))
                 .andDo(print())
                 .andExpect(status().isOk()).andReturn();
-        assertEquals(res.getResponse().getContentAsString(), newString.substring(0, newString.length() - 1)+"]");
+        assertEquals(res.getResponse().getContentAsString(), newString);
     }
 
     @Test
@@ -188,21 +81,138 @@ public class ControllerTest {
 
 	@Test
 	public void findById() throws Exception {
-        this.mockMvc.perform(get("/books/3")
+        Long id = Long.parseLong("3");
+        MvcResult res = this.mockMvc.perform(get("/books/" + id)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(content().json("{\"id\":3,\"name\":\"War and peace\",\"shelf\":{\"id\":2,\"level\":1,\"rack\":{\"id\":1}}}"));
-	}
+                .andExpect(status().isOk()).andReturn();
+        assertEquals(res.getResponse().getContentAsString(),
+                repository.findById(id).orElse(new BookEntity("No name")).toString());
+    }
 
 	@Test
 	public void findByRackId() throws Exception {
-        MvcResult res = this.mockMvc.perform(get("/books/rack/10")
+        String id = "10";
+        Iterable<BookEntity> books = repository.findByRackId(id);
+
+        ArrayList<String> strBooks = new ArrayList<>();
+        for( BookEntity b: books) {
+            strBooks.add(b.toString());
+        }
+
+        String newString = String.join(",", strBooks);
+        newString = String.format("[%s]", newString);
+
+        MvcResult res = this.mockMvc.perform(get("/books/rack/" + id))
+                .andDo(print())
+                .andExpect(status().isOk()).andReturn();
+        assertEquals(res.getResponse().getContentAsString(), newString);
+    }
+
+	@Test
+	public void findByShelfId() throws Exception {
+        Long id = Long.parseLong("8");
+        Iterable<BookEntity> books = repository.findByShelfId(id);
+
+        ArrayList<String> strBooks = new ArrayList<>();
+        for( BookEntity b: books) {
+            strBooks.add(b.toString());
+        }
+
+        String newString = String.join(",", strBooks);
+        newString = String.format("[%s]", newString);
+
+        MvcResult res = this.mockMvc.perform(get("/books/shelf/" + id))
+                .andDo(print())
+                .andExpect(status().isOk()).andReturn();
+        assertEquals(res.getResponse().getContentAsString(), newString);
+    }
+
+	@Test
+	public void findByRackAndShelfId() throws Exception {
+        String rackId = "10";
+        String shelfId = "14";
+        Iterable<BookEntity> books = repository.findByRackIdAndShelfId(rackId, shelfId);
+
+        ArrayList<String> strBooks = new ArrayList<>();
+        for( BookEntity b: books) {
+            strBooks.add(b.toString());
+        }
+
+        String newString = String.join(",", strBooks);
+        newString = String.format("[%s]", newString);
+
+        MvcResult res = this.mockMvc.perform(get("/books/rack_shelf/" + rackId + "/" + shelfId))
+                .andDo(print())
+                .andExpect(status().isOk()).andReturn();
+        assertEquals(res.getResponse().getContentAsString(), newString);
+    }
+
+	@Test
+	public void findByName() throws Exception {
+        String name = "1984";
+        MvcResult res = this.mockMvc.perform(get("/books/name/" + name)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-//                .andExpect(content().("{\"id\":3,\"name\":\"War and peace\",\"shelf\":{\"id\":2,\"level\":1,\"rack\":{\"id\":1}}}"));
-                .andReturn();
+                .andExpect(status().isOk()).andReturn();
+        assertEquals(res.getResponse().getContentAsString(),
+                repository.findByName(name).orElse(new BookEntity("No name")).toString());
+    }
 
+    @Test
+    public void deleteBook() throws Exception {
+        String id = "17";
+        MvcResult resBefore = this.mockMvc.perform(get("/books/" + id))
+                .andDo(print())
+                .andExpect(status().isOk()).andReturn();
+        assertEquals(resBefore.getResponse().getContentAsString(),
+                repository.findById(Long.parseLong(id)).orElse(new BookEntity("No name")).toString());
 
-	}
+        this.mockMvc.perform(delete("/books/" + id))
+        .andDo(print());
+        MvcResult res = this.mockMvc.perform(get("/books/" + id))
+                .andDo(print())
+                .andExpect(status().isNotFound()).andReturn();
+        assertEquals(res.getResponse().getStatus(), 404);
+    }
+
+    @Test
+    public void changeBook() throws Exception {
+        String id = "13";
+        String newName = "The Hobbit";
+        Long newShelfId = Long.parseLong("2");
+        Integer newShelfLevel = 1;
+        Long newRackId = Long.parseLong("1");
+        MvcResult resBefore = this.mockMvc.perform(get("/books/" + id))
+                .andDo(print())
+                .andExpect(status().isOk()).andReturn();
+        assertEquals(resBefore.getResponse().getContentAsString(),
+                repository.findById(Long.parseLong(id)).orElse(new BookEntity("No name")).toString());
+
+        JSONObject obj = new JSONObject(resBefore.getResponse().getContentAsString());
+        JSONObject shelf = obj.getJSONObject("shelf");
+        JSONObject rack = shelf.getJSONObject("rack");
+        rack.put("id", newRackId);
+        shelf.put("rack", rack);
+        shelf.put("level", newShelfLevel);
+        shelf.put("id", newShelfId);
+        obj.put("shelf", shelf);
+        obj.put("name", newName);
+
+        MvcResult res = this.mockMvc.perform(put("/books/" + id)
+                .contentType(MediaType.APPLICATION_JSON).content(obj.toString()))
+                .andDo(print()).andExpect(status().isOk()).andReturn();
+
+        MvcResult resAfter = this.mockMvc.perform(get("/books/" + id))
+                .andDo(print())
+                .andExpect(status().isOk()).andReturn();
+
+        BookEntity changedBook = repository.findById(Long.parseLong(id)).orElse(new BookEntity("noName"));
+
+        assertEquals(changedBook.getName(), newName);
+        assertEquals(changedBook.getShelf().getId(), newShelfId);
+        assertEquals(changedBook.getShelf().getLevel(), newShelfLevel);
+        assertEquals(changedBook.getShelf().getRack().getId(), newRackId);
+    }
 
 }

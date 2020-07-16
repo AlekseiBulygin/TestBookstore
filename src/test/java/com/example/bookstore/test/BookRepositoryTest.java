@@ -11,7 +11,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -31,8 +30,6 @@ public class BookRepositoryTest {
 
     @Test
     public void testFindByName() {
-        BookEntity book = new BookEntity("Oblomov");
-        repository.save(book);
         BookEntity newBook = repository.findByName("Idiot").orElse(new BookEntity("noName"));
         assertThat(newBook.getName().equals("Idiot"));
     }
