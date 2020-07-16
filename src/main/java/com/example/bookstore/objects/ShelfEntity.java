@@ -82,11 +82,7 @@ public class ShelfEntity {
 
     @Override
     public String toString() {
-        return "ShelfEntity{" +
-                "id=" + id +
-                ", level=" + level +
-                ", books=" + books +
-                ", rack=" + rack +
-                '}';
+        return String.format("{\"id\":%d,\"level\":%s,\"rack\":%s}",
+                this.id, this.level, this.rack.toString());
     }
 }

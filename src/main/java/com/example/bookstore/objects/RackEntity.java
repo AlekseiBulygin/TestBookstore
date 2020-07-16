@@ -35,4 +35,9 @@ public class RackEntity {
     public void setShelves(List<ShelfEntity> shelves) {
         this.shelves = shelves;
     }
+
+    @Override
+    public String toString() {
+        return String.format("{\"id\":%d}", this.id);
+    }
 }

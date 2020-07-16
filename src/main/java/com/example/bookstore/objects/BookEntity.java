@@ -46,7 +46,7 @@ public class BookEntity {
 
     @Override
     public String toString() {
-        return String.format("BookEntity{id = %d, name='%s, shelf = %d",
-                this.id, this.name, this.shelf.getId());
+        return String.format("{\"id\":%d,\"name\":\"%s\",\"shelf\":%s}",
+                this.id, this.name, this.shelf.toString());
     }
 }
