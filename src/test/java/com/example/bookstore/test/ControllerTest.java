@@ -1,14 +1,12 @@
 package com.example.bookstore.test;
 
 import com.example.bookstore.controller.BookstoreController;
-import static org.hamcrest.Matchers.containsString;
 
 import com.example.bookstore.objects.*;
-import com.example.bookstore.repo.*;
+import com.example.bookstore.service.BookService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -33,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 public class ControllerTest {
 
     @Autowired
-    BookRepository repository;
+    BookService bookService;
 
     @Autowired
     private BookstoreController controller;
@@ -51,7 +49,7 @@ public class ControllerTest {
 
     @Test
     public void showBooks() throws Exception {
-        Iterable<BookEntity> books = repository.findAll();
+        Iterable<BookEntity> books = bookService.findAll();
 
         ArrayList<String> strBooks = new ArrayList<>();
         for( BookEntity b: books) {
@@ -76,24 +74,24 @@ public class ControllerTest {
         .content(objectMapper.writeValueAsString(newBook)))
               .andExpect(status().isOk());
 
-        assertThat(repository.findByName("New Book").orElse(new BookEntity("noname")).equals(newBook));
+        assertThat(bookService.findByName("New Book").equals(newBook));
 	}
 
 	@Test
 	public void findById() throws Exception {
-        Long id = Long.parseLong("3");
+        Long id = 3L;
         MvcResult res = this.mockMvc.perform(get("/books/" + id)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk()).andReturn();
         assertEquals(res.getResponse().getContentAsString(),
-                repository.findById(id).orElse(new BookEntity("No name")).toString());
+                bookService.findById(id).toString());
     }
 
 	@Test
 	public void findByRackId() throws Exception {
-        String id = "10";
-        Iterable<BookEntity> books = repository.findByRackId(id);
+        Long id = 10L;
+        Iterable<BookEntity> books = bookService.findByRackId(id);
 
         ArrayList<String> strBooks = new ArrayList<>();
         for( BookEntity b: books) {
@@ -111,8 +109,8 @@ public class ControllerTest {
 
 	@Test
 	public void findByShelfId() throws Exception {
-        Long id = Long.parseLong("8");
-        Iterable<BookEntity> books = repository.findByShelfId(id);
+        Long id = 8L;
+        Iterable<BookEntity> books = bookService.findByShelfId(id);
 
         ArrayList<String> strBooks = new ArrayList<>();
         for( BookEntity b: books) {
@@ -130,9 +128,9 @@ public class ControllerTest {
 
 	@Test
 	public void findByRackAndShelfId() throws Exception {
-        String rackId = "10";
-        String shelfId = "14";
-        Iterable<BookEntity> books = repository.findByRackIdAndShelfId(rackId, shelfId);
+        Long rackId = 10L;
+        Long shelfId = 14L;
+        Iterable<BookEntity> books = bookService.findByRackIdAndShelfId(rackId, shelfId);
 
         ArrayList<String> strBooks = new ArrayList<>();
         for( BookEntity b: books) {
@@ -156,17 +154,17 @@ public class ControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk()).andReturn();
         assertEquals(res.getResponse().getContentAsString(),
-                repository.findByName(name).orElse(new BookEntity("No name")).toString());
+                bookService.findByName(name).toString());
     }
 
     @Test
     public void deleteBook() throws Exception {
-        String id = "17";
+        Long id = 17L;
         MvcResult resBefore = this.mockMvc.perform(get("/books/" + id))
                 .andDo(print())
                 .andExpect(status().isOk()).andReturn();
         assertEquals(resBefore.getResponse().getContentAsString(),
-                repository.findById(Long.parseLong(id)).orElse(new BookEntity("No name")).toString());
+                bookService.findById(id).toString());
 
         this.mockMvc.perform(delete("/books/" + id))
         .andDo(print());
@@ -177,8 +175,8 @@ public class ControllerTest {
     }
 
     @Test
-    public void changeBook() throws Exception {
-        String id = "13";
+    public void replaceBook() throws Exception {
+        Long id = 13L;
         String newName = "The Hobbit";
         Long newShelfId = Long.parseLong("2");
         Integer newShelfLevel = 1;
@@ -187,7 +185,7 @@ public class ControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk()).andReturn();
         assertEquals(resBefore.getResponse().getContentAsString(),
-                repository.findById(Long.parseLong(id)).orElse(new BookEntity("No name")).toString());
+                bookService.findById(id).toString());
 
         JSONObject obj = new JSONObject(resBefore.getResponse().getContentAsString());
         JSONObject shelf = obj.getJSONObject("shelf");
@@ -207,7 +205,7 @@ public class ControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk()).andReturn();
 
-        BookEntity changedBook = repository.findById(Long.parseLong(id)).orElse(new BookEntity("noName"));
+        BookEntity changedBook = bookService.findById(id);
 
         assertEquals(changedBook.getName(), newName);
         assertEquals(changedBook.getShelf().getId(), newShelfId);
