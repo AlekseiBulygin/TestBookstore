@@ -2,6 +2,7 @@ package com.example.bookstore;
 
 import com.example.bookstore.objects.*;
 import com.example.bookstore.repo.*;
+import com.example.bookstore.service.BookServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ import java.util.ArrayList;
 @SpringBootApplication(scanBasePackages = {"com.example.bookstore"})
 public class Bookstore implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(Bookstore.class);
+
+    @Autowired
+    BookServiceImpl bookService;
 
     @Autowired
     BookRepository repository;
@@ -113,19 +117,19 @@ public class Bookstore implements CommandLineRunner {
 
         rackRepository.save(rack1);
         shelfRepository.saveAll(shelvesList);
-        repository.save(book11);
-        repository.save(book12);
-        repository.save(book13);
-        repository.save(book14);
-        repository.save(book15);
+        bookService.save(book11);
+        bookService.save(book12);
+        bookService.save(book13);
+        bookService.save(book14);
+        bookService.save(book15);
 
         rackRepository.save(rack2);
         shelfRepository.saveAll(shelvesList2);
-        repository.save(book21);
-        repository.save(book22);
-        repository.save(book23);
-        repository.save(book24);
-        repository.save(book25);
+        bookService.save(book21);
+        bookService.save(book22);
+        bookService.save(book23);
+        bookService.save(book24);
+        bookService.save(book25);
     };
 
 }
