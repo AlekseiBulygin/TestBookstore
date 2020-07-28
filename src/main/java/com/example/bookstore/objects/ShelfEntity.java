@@ -12,7 +12,7 @@ public class ShelfEntity {
     @GeneratedValue
 
     private Long id;
-    private Integer level;
+    private Long level;
 
     @OneToMany(targetEntity = BookEntity.class, mappedBy = "shelf", cascade=CascadeType.ALL)
     private List<BookEntity> books;
@@ -23,7 +23,7 @@ public class ShelfEntity {
 
     protected ShelfEntity() {};
 
-    public ShelfEntity(Integer level) {
+    public ShelfEntity(Long level) {
         this.level = level;
     }
 
@@ -35,11 +35,11 @@ public class ShelfEntity {
         this.id = id;
     }
 
-    public Integer getLevel() {
+    public Long getLevel() {
         return this.level;
     }
 
-    public void setLevel(Integer level) {
+    public void setLevel(Long level) {
         this.level = level;
     }
 
@@ -62,22 +62,6 @@ public class ShelfEntity {
 
     public void setBooks(List<BookEntity> books) {
         this.books = books;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ShelfEntity that = (ShelfEntity) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(level, that.level) &&
-                Objects.equals(books, that.books) &&
-                Objects.equals(rack, that.rack);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, level, books, rack);
     }
 
     @Override

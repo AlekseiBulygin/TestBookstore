@@ -1,8 +1,10 @@
 package com.example.bookstore.test;
 
+import com.example.bookstore.dto.BookDTO;
 import com.example.bookstore.objects.*;
 import com.example.bookstore.service.BookService;
 import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,18 +19,23 @@ import static org.junit.Assert.assertEquals;
 @SpringBootTest
 public class BookRepositoryTest {
 
+    @Before
+    public void before() {
+        System.out.println("ho-ho-ho");
+    }
+
     @Autowired
     private BookService bookService;
 
     @Test
     public void findByName() {
-        BookEntity newBook = bookService.findByName("Idiot");
+        BookDTO newBook = bookService.findByName("Idiot");
         assertThat(newBook.getName().equals("Idiot"));
     }
 
     @Test
 	public void findAll() throws Exception {
-        List<BookEntity> books = bookService.findAll();
+        List<BookDTO> books = bookService.findAll();
         assertEquals(books.size(), 10);
 	}
 

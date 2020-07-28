@@ -1,25 +1,25 @@
 package com.example.bookstore.service;
 
-import com.example.bookstore.objects.BookEntity;
+import com.example.bookstore.dto.BookDTO;
 
 import java.util.List;
 
 public interface BookService {
-    BookEntity save(BookEntity newBook);
+    BookDTO save(BookDTO newBook);
 
-    BookEntity findByName(String name);
+    BookDTO findByName(String name);
 
-    BookEntity findById(Long id);
+    BookDTO findById(Long id);
 
-    List<BookEntity> findAll();
+    List<BookDTO> findAll();
 
-    List<BookEntity> findByRackId(Long id);
+    List<BookDTO> findByRackId(Long id);
 
-    List<BookEntity> findByShelfId(Long id);
+    List<BookDTO> findByShelfId(Long id);
 
-    List<BookEntity> findByRackIdAndShelfId(Long rackId, Long shelfId);
+    List<BookDTO> findByRackIdAndShelfId(Long rackId, Long shelfId);
 
-    BookEntity replaceBook(BookEntity newBook, Long id);
+    BookDTO replaceBook(BookDTO newBook, Long id);
 
     void deleteById(Long id);
 

@@ -27,7 +27,7 @@ public class RackEntity {
         this.id = id;
     }
 
-    @JsonIgnore
+//    @JsonIgnore
     public List<ShelfEntity> getShelves() {
         return shelves;
     }

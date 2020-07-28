@@ -12,13 +12,16 @@ public interface BookRepository extends CrudRepository<BookEntity, Long> {
 
     List<BookEntity> findByShelfId(Long id);
 
+    @Override
+    List<BookEntity> findAll();
+
     @Query(value = "SELECT * FROM book " +
             "INNER JOIN shelf ON shelf.id = book.shelf_id " +
             "WHERE shelf.rack_id = ?1", nativeQuery = true)
-    List<BookEntity> findByRackId(String id);
+    List<BookEntity> findByRackId(Long id);
 
     @Query(value = "SELECT * FROM book " +
             "INNER JOIN shelf ON shelf.id = book.shelf_id " +
             "WHERE shelf.rack_id = ?1 AND book.shelf_id = ?2", nativeQuery = true)
-    List<BookEntity> findByRackIdAndShelfId(String rackId, String shelfId);
+    List<BookEntity> findByRackIdAndShelfId(Long rackId, Long shelfId);
 }
