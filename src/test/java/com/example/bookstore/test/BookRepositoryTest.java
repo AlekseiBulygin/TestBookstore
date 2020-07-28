@@ -44,13 +44,13 @@ public class BookRepositoryTest {
         assertEquals(bookService.findByRackId(10L).size(), 5);
 	}
 
-	@Test
-	public void findByShelfId() throws Exception {
-        assertEquals(bookService.findByShelfId(2L).size(), 2);
-	}
-
-	@Test
-	public void findByRackAndShelfId() throws Exception {
-        assertEquals(bookService.findByRackIdAndShelfId(1L, 5L).size(), 2);
-	}
+//	@Test
+//	public void findByShelfId() throws Exception {
+//        assertEquals(bookService.findByShelfId(2L).size(), 2);
+//	}
+//
+//	@Test
+//	public void findByRackAndShelfId() throws Exception {
+//        assertEquals(bookService.findByRackIdAndShelfId(1L, 5L).size(), 2);
+//	}
 }

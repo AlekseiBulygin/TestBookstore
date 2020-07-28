@@ -10,7 +10,7 @@ public interface BookRepository extends CrudRepository<BookEntity, Long> {
 
     Optional<BookEntity> findByName(String name);
 
-    List<BookEntity> findByShelfId(Long id);
+    List<BookEntity> findByShelfLevel(Long shelfLevel);
 
     @Override
     List<BookEntity> findAll();
@@ -22,6 +22,6 @@ public interface BookRepository extends CrudRepository<BookEntity, Long> {
 
     @Query(value = "SELECT * FROM book " +
             "INNER JOIN shelf ON shelf.id = book.shelf_id " +
-            "WHERE shelf.rack_id = ?1 AND book.shelf_id = ?2", nativeQuery = true)
-    List<BookEntity> findByRackIdAndShelfId(Long rackId, Long shelfId);
+            "WHERE shelf.rack_id = ?1 AND shelf.level = ?2", nativeQuery = true)
+    List<BookEntity> findByRackIdAndShelfLevel(Long rackId, Long shelfLevel);
 }

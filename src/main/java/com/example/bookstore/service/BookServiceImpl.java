@@ -62,13 +62,13 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookDTO> findByShelfId(Long id) {
-        return bookRepository.findByShelfId(id).stream().map(bookMapper::toDto).collect(Collectors.toList());
+    public List<BookDTO> findByShelfLevel(Long shelfLevel) {
+        return bookRepository.findByShelfLevel(shelfLevel).stream().map(bookMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<BookDTO> findByRackIdAndShelfId(Long rackId, Long shelfId) {
-        return bookRepository.findByRackIdAndShelfId(rackId, shelfId).stream().map(bookMapper::toDto).collect(Collectors.toList());
+    public List<BookDTO> findByRackIdAndShelfLevel(Long rackId, Long shelfLevel) {
+        return bookRepository.findByRackIdAndShelfLevel(rackId, shelfLevel).stream().map(bookMapper::toDto).collect(Collectors.toList());
     }
 
     @Override

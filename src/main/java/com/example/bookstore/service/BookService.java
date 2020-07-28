@@ -15,9 +15,9 @@ public interface BookService {
 
     List<BookDTO> findByRackId(Long id);
 
-    List<BookDTO> findByShelfId(Long id);
+    List<BookDTO> findByShelfLevel(Long shelfLevel);
 
-    List<BookDTO> findByRackIdAndShelfId(Long rackId, Long shelfId);
+    List<BookDTO> findByRackIdAndShelfLevel(Long rackId, Long shelfLevel);
 
     BookDTO replaceBook(BookDTO newBook, Long id);
 
