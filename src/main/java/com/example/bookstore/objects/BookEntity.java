@@ -1,6 +1,7 @@
 package com.example.bookstore.objects;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name="book")
@@ -42,6 +43,20 @@ public class BookEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BookEntity that = (BookEntity) o;
+        return Objects.equals(name, that.name) &&
+                Objects.equals(shelf, that.shelf);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, shelf);
     }
 
     @Override

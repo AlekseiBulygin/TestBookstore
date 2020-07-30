@@ -40,13 +40,13 @@ public class BookstoreController {
         return ResponseEntity.ok(bookService.save(newBook));
     }
 
-    @GetMapping("/bookstore/books/{id}")
-    ResponseEntity<BookDTO> one(@PathVariable Long id) {
+    @GetMapping(value = "/bookstore/books", params = "id")
+    ResponseEntity<BookDTO> one(@RequestParam Long id) {
         return ResponseEntity.ok(bookService.findById(id));
     }
 
-    @GetMapping("/bookstore/books/{name}")
-    ResponseEntity<BookDTO> oneByName(@PathVariable String name) {
+    @GetMapping(value = "/bookstore/books", params = "name")
+    ResponseEntity<BookDTO> oneByName(@RequestParam String name) {
         return ResponseEntity.ok(bookService.findByName(name));
     }
 

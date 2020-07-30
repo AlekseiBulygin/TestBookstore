@@ -1,217 +1,138 @@
 package com.example.bookstore.test;
 
-import com.example.bookstore.controller.BookstoreController;
-
 import com.example.bookstore.dto.BookDTO;
-import com.example.bookstore.objects.*;
 import com.example.bookstore.service.BookService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.ArrayList;
+import java.util.Collections;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 public class ControllerTest {
 
-    @Autowired
+    private BookDTO currentBook;
+
+    @MockBean
     BookService bookService;
-
-    @Autowired
-    private BookstoreController controller;
-
-    @Autowired
-    ObjectMapper objectMapper;
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Test
-    public void test() throws Exception {
-        assertThat(controller).isNotNull();
+    @Before
+    public void setUp() {
+        currentBook = new BookDTO();
+        currentBook.setName("Book Name");
+        currentBook.setId(3L);
+        currentBook.setShelfLevel(2L);
+        currentBook.setRackId(1L);
     }
 
-//    @Test
-//    public void showBooks() throws Exception {
-//        Iterable<BookEntity> books = bookService.findAll();
-//
-//        ArrayList<String> strBooks = new ArrayList<>();
-//        for( BookEntity b: books) {
-//            strBooks.add(b.toString());
-//        }
-//
-//        String newString = String.join(",", strBooks);
-//        newString = String.format("[%s]", newString);
-//
-//        MvcResult res = this.mockMvc.perform(get("/books"))
-//                .andDo(print())
-//                .andExpect(status().isOk()).andReturn();
-//        assertEquals(res.getResponse().getContentAsString(), newString);
-//    }
+    @Test
+    public void whenRequestFindAll_thenStatusOk() throws Exception {
+        Mockito.when(bookService.findAll()).thenReturn(Collections.singletonList(currentBook));
+        mockMvc.perform(get("/bookstore"))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
 
     @Test
-	public void addNewBook() throws Exception {
-        BookEntity newBook = new BookEntity("New Book");
-
-        this.mockMvc.perform(post("/addBook")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(newBook)))
-              .andExpect(status().isOk());
-
-        assertThat(bookService.findByName("New Book").equals(newBook));
+	public void givenNewBook_whenRequestSaveNewBook_thenStatusOk() throws Exception {
+        Mockito.when(bookService.save(currentBook)).thenReturn(currentBook);
+        mockMvc.perform(post("/bookstore/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(currentBook.toString()))
+                .andDo(print())
+                .andExpect(status().isOk());
 	}
 
 	@Test
-	public void findById() throws Exception {
-        Long id = 3L;
-        MvcResult res = this.mockMvc.perform(get("/books/" + id)
+	public void givenBookName_whenRequestFindByName_thenStatusOk() throws Exception {
+        String name = "Book Name";
+        Mockito.when(bookService.findByName(name)).thenReturn(currentBook);
+
+        mockMvc.perform(get("/bookstore/books")
+                .param("name", name)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isOk()).andReturn();
-        assertEquals(res.getResponse().getContentAsString(),
-                bookService.findById(id).toString());
+                .andExpect(status().isOk());
     }
 
-//	@Test
-//	public void findByRackId() throws Exception {
-//        Long id = 10L;
-//        Iterable<BookDTO> books = bookService.findByRackId(id);
-//
-//        ArrayList<String> strBooks = new ArrayList<>();
-//        for( BookEntity b: books) {
-//            strBooks.add(b.toString());
-//        }
-//
-//        String newString = String.join(",", strBooks);
-//        newString = String.format("[%s]", newString);
-//
-//        MvcResult res = this.mockMvc.perform(get("/books/rack/" + id))
-//                .andDo(print())
-//                .andExpect(status().isOk()).andReturn();
-//        assertEquals(res.getResponse().getContentAsString(), newString);
-//    }
-//
-//	@Test
-//	public void findByShelfId() throws Exception {
-//        Long id = 8L;
-//        Iterable<BookEntity> books = bookService.findByShelfId(id);
-//
-//        ArrayList<String> strBooks = new ArrayList<>();
-//        for( BookEntity b: books) {
-//            strBooks.add(b.toString());
-//        }
-//
-//        String newString = String.join(",", strBooks);
-//        newString = String.format("[%s]", newString);
-//
-//        MvcResult res = this.mockMvc.perform(get("/books/shelf/" + id))
-//                .andDo(print())
-//                .andExpect(status().isOk()).andReturn();
-//        assertEquals(res.getResponse().getContentAsString(), newString);
-//    }
-//
-//	@Test
-//	public void findByRackAndShelfId() throws Exception {
-//        Long rackId = 10L;
-//        Long shelfId = 14L;
-//        Iterable<BookEntity> books = bookService.findByRackIdAndShelfId(rackId, shelfId);
-//
-//        ArrayList<String> strBooks = new ArrayList<>();
-//        for( BookEntity b: books) {
-//            strBooks.add(b.toString());
-//        }
-//
-//        String newString = String.join(",", strBooks);
-//        newString = String.format("[%s]", newString);
-//
-//        MvcResult res = this.mockMvc.perform(get("/books/rack_shelf/" + rackId + "/" + shelfId))
-//                .andDo(print())
-//                .andExpect(status().isOk()).andReturn();
-//        assertEquals(res.getResponse().getContentAsString(), newString);
-//    }
-
 	@Test
-	public void findByName() throws Exception {
-        String name = "1984";
-        MvcResult res = this.mockMvc.perform(get("/books/name/" + name)
+	public void givenBookId_whenRequestFindById_thenStatusOk() throws Exception {
+        Long bookId = 3L;
+        Mockito.when(bookService.findById(bookId)).thenReturn(currentBook);
+
+        mockMvc.perform(get("/bookstore/books")
+                .param("id", bookId.toString())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isOk()).andReturn();
-        assertEquals(res.getResponse().getContentAsString(),
-                bookService.findByName(name).toString());
+                .andExpect(status().isOk());
+    }
+
+	@Test
+	public void givenRackId_whenRequestFindBooksByRackId_thenStatusOk() throws Exception {
+        Long rackId = 1L;
+        Mockito.when(bookService.findByRackId(rackId)).thenReturn(Collections.singletonList(currentBook));
+
+        mockMvc.perform(get("/bookstore/books")
+                .param("rackId", rackId.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+	@Test
+	public void givenShelfLevel_whenRequestFindBooksByShelfLevel_thenStatusOk() throws Exception {
+        Long shelfLevel = 2L;
+        Mockito.when(bookService.findByShelfLevel(shelfLevel)).thenReturn(Collections.singletonList(currentBook));
+
+        mockMvc.perform(get("/bookstore/books")
+                .param("shelfLevel", shelfLevel.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 
     @Test
-    public void deleteBook() throws Exception {
-        Long id = 17L;
-        MvcResult resBefore = this.mockMvc.perform(get("/books/" + id))
-                .andDo(print())
-                .andExpect(status().isOk()).andReturn();
-        assertEquals(resBefore.getResponse().getContentAsString(),
-                bookService.findById(id).toString());
-
-        this.mockMvc.perform(delete("/books/" + id))
-        .andDo(print());
-        MvcResult res = this.mockMvc.perform(get("/books/" + id))
-                .andDo(print())
-                .andExpect(status().isNotFound()).andReturn();
-        assertEquals(res.getResponse().getStatus(), 404);
+    public void givenBookId_whenRequestDeleteBook_thenStatusOk() throws Exception {
+        Long bookId = 3L;
+        Mockito.doNothing().when(bookService).deleteById(bookId);
+        mockMvc.perform(delete("/bookstore/books/" + bookId))
+                .andDo(print());
     }
 
-//    @Test
-//    public void replaceBook() throws Exception {
-//        Long id = 13L;
-//        String newName = "The Hobbit";
-//        Long newShelfId = Long.parseLong("2");
-//        Integer newShelfLevel = 1;
-//        Long newRackId = Long.parseLong("1");
-//        MvcResult resBefore = this.mockMvc.perform(get("/books/" + id))
-//                .andDo(print())
-//                .andExpect(status().isOk()).andReturn();
-//        assertEquals(resBefore.getResponse().getContentAsString(),
-//                bookService.findById(id).toString());
-//
-//        JSONObject obj = new JSONObject(resBefore.getResponse().getContentAsString());
-//        JSONObject shelf = obj.getJSONObject("shelf");
-//        JSONObject rack = shelf.getJSONObject("rack");
-//        rack.put("id", newRackId);
-//        shelf.put("rack", rack);
-//        shelf.put("level", newShelfLevel);
-//        shelf.put("id", newShelfId);
-//        obj.put("shelf", shelf);
-//        obj.put("name", newName);
-//
-//        MvcResult res = this.mockMvc.perform(put("/books/" + id)
-//                .contentType(MediaType.APPLICATION_JSON).content(obj.toString()))
-//                .andDo(print()).andExpect(status().isOk()).andReturn();
-//
-//        MvcResult resAfter = this.mockMvc.perform(get("/books/" + id))
-//                .andDo(print())
-//                .andExpect(status().isOk()).andReturn();
-//
-//        BookEntity changedBook = bookService.findById(id);
-//
-//        assertEquals(changedBook.getName(), newName);
-//        assertEquals(changedBook.getShelf().getId(), newShelfId);
-//        assertEquals(changedBook.getShelf().getLevel(), newShelfLevel);
-//        assertEquals(changedBook.getShelf().getRack().getId(), newRackId);
-//    }
+    @Test
+    public void givenBookId_whenRequestReplaceBook_thenStatusOk() throws Exception {
+        Long bookId = 3L;
 
+        String newName = "The Hobbit";
+        Long newShelfLevel = 3L;
+        Long newRackId = 2L;
+        BookDTO newBook = new BookDTO();
+        newBook.setName(newName);
+        newBook.setShelfLevel(newShelfLevel);
+        newBook.setRackId(newRackId);
+
+        Mockito.when(bookService.replaceBook(newBook, bookId)).thenReturn(newBook);
+
+        mockMvc.perform(put("/bookstore/books/" + bookId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(newBook.toString()))
+                .andDo(print()).andExpect(status().isOk()).andReturn();
+    }
 }

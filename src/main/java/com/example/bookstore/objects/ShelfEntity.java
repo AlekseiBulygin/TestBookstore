@@ -65,6 +65,21 @@ public class ShelfEntity {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ShelfEntity that = (ShelfEntity) o;
+        return Objects.equals(level, that.level) &&
+                Objects.equals(books, that.books) &&
+                Objects.equals(rack, that.rack);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(level, books, rack);
+    }
+
+    @Override
     public String toString() {
         return String.format("{\"id\":%d,\"level\":%s,\"rack\":%s}",
                 this.id, this.level, this.rack.toString());
