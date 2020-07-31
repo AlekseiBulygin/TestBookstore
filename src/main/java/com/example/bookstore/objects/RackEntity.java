@@ -10,7 +10,7 @@ import java.util.*;
 public class RackEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  Long id;
 
 

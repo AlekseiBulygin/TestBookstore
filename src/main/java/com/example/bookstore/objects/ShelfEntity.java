@@ -9,8 +9,7 @@ import java.util.*;
 @Table(name = "shelf")
 public class ShelfEntity {
     @Id
-    @GeneratedValue
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long level;
 
