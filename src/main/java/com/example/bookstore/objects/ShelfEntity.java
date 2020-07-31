@@ -50,7 +50,6 @@ public class ShelfEntity {
         this.rack = rack;
     }
 
-    @JsonIgnore
     public List<BookEntity> getBooks() {
         return books;
     }

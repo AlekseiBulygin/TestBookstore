@@ -1,3 +1,11 @@
 CREATE TABLE IF NOT EXISTS rack(id serial PRIMARY KEY);
-CREATE TABLE IF NOT EXISTS shelf(id serial PRIMARY KEY, level serial, rack_id serial);
-CREATE TABLE IF NOT EXISTS book(id serial PRIMARY KEY, name varchar(50), shelf_id serial);
+
+CREATE TABLE IF NOT EXISTS shelf(id serial PRIMARY KEY,
+                                 level serial,
+                                 rack_id serial,
+                                 FOREIGN KEY (rack_id) REFERENCES rack (id) ON DELETE CASCADE);
+
+CREATE TABLE IF NOT EXISTS book(id serial PRIMARY KEY,
+                                name varchar(50),
+                                shelf_id serial,
+                                FOREIGN KEY (shelf_id) REFERENCES shelf (id) ON DELETE CASCADE);
