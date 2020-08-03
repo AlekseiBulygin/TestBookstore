@@ -1,16 +1,16 @@
 package com.example.bookstore.objects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name="rack")
 public class RackEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  Long id;
 
 
@@ -27,7 +27,6 @@ public class RackEntity {
         this.id = id;
     }
 
-//    @JsonIgnore
     public List<ShelfEntity> getShelves() {
         return shelves;
     }
