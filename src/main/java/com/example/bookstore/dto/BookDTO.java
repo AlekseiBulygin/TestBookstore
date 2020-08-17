@@ -1,11 +1,16 @@
 package com.example.bookstore.dto;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.util.Objects;
 
 public class BookDTO {
     private Long id;
     private String name;
     private Long rackId;
+
+    @Max(3L)
+    @Min(1L)
     private Long shelfLevel;
 
     public Long getId() {

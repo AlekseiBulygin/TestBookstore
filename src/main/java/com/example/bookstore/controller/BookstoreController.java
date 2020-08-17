@@ -3,11 +3,16 @@ package com.example.bookstore.controller;
 import com.example.bookstore.dto.BookDTO;
 import com.example.bookstore.service.BookService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @RestController
+@Validated
 public class BookstoreController {
     private final BookService bookService;
 
@@ -26,17 +31,18 @@ public class BookstoreController {
     }
 
     @GetMapping(value = "/bookstore/books", params = "shelfLevel")
-    ResponseEntity<List<BookDTO>> byShelfLevel(@RequestParam Long shelfLevel) {
+    ResponseEntity<List<BookDTO>> byShelfLevel(@RequestParam @Max(3L) @Min(1L) Long shelfLevel) {
         return ResponseEntity.ok(bookService.findByShelfLevel(shelfLevel));
     }
 
     @GetMapping("/bookstore/books")
-    ResponseEntity<List<BookDTO>> byRackIdAndShelfId(@RequestParam Long rackId, @RequestParam Long shelfLevel) {
+    ResponseEntity<List<BookDTO>> byRackIdAndShelfId(@RequestParam Long rackId,
+            @RequestParam @Max(3L) @Min(1L) Long shelfLevel) {
         return ResponseEntity.ok(bookService.findByRackIdAndShelfLevel(rackId, shelfLevel));
     }
 
     @PostMapping(value = "/bookstore/books", consumes = {"application/json"})
-    ResponseEntity<BookDTO> newBook(@RequestBody BookDTO newBook) {
+    ResponseEntity<BookDTO> newBook(@RequestBody @Valid BookDTO newBook) {
         return ResponseEntity.ok(bookService.save(newBook));
     }
 
