@@ -12,6 +12,7 @@ import javax.validation.constraints.Min;
 import java.util.List;
 
 @RestController
+@RequestMapping("/bookstore")
 @Validated
 public class BookstoreController {
     private final BookService bookService;
@@ -20,48 +21,48 @@ public class BookstoreController {
         this.bookService = service;
     }
 
-    @GetMapping("/bookstore")
+    @GetMapping
     ResponseEntity<List<BookDTO>> all() {
         return ResponseEntity.ok(bookService.findAll());
     }
 
-    @GetMapping(value = "/bookstore/books", params = "rackId")
+    @GetMapping(value = "/books", params = "rackId")
     ResponseEntity<List<BookDTO>> byRackId(@RequestParam Long rackId) {
         return ResponseEntity.ok(bookService.findByRackId(rackId));
     }
 
-    @GetMapping(value = "/bookstore/books", params = "shelfLevel")
+    @GetMapping(value = "/books", params = "shelfLevel")
     ResponseEntity<List<BookDTO>> byShelfLevel(@RequestParam @Max(3L) @Min(1L) Long shelfLevel) {
         return ResponseEntity.ok(bookService.findByShelfLevel(shelfLevel));
     }
 
-    @GetMapping("/bookstore/books")
+    @GetMapping(value = "/books", params = {"rackId", "shelfLevel"})
     ResponseEntity<List<BookDTO>> byRackIdAndShelfId(@RequestParam Long rackId,
             @RequestParam @Max(3L) @Min(1L) Long shelfLevel) {
         return ResponseEntity.ok(bookService.findByRackIdAndShelfLevel(rackId, shelfLevel));
     }
 
-    @PostMapping(value = "/bookstore/books", consumes = {"application/json"})
+    @PostMapping(value = "/books", consumes = {"application/json"})
     ResponseEntity<BookDTO> newBook(@RequestBody @Valid BookDTO newBook) {
         return ResponseEntity.ok(bookService.save(newBook));
     }
 
-    @GetMapping(value = "/bookstore/books", params = "id")
+    @GetMapping(value = "/books", params = "id")
     ResponseEntity<BookDTO> one(@RequestParam Long id) {
         return ResponseEntity.ok(bookService.findById(id));
     }
 
-    @GetMapping(value = "/bookstore/books", params = "name")
+    @GetMapping(value = "/books", params = "name")
     ResponseEntity<BookDTO> oneByName(@RequestParam String name) {
         return ResponseEntity.ok(bookService.findByName(name));
     }
 
-    @PutMapping("/bookstore/books/{id}")
+    @PutMapping("/books/{id}")
     ResponseEntity<BookDTO> replaceBook(@RequestBody BookDTO newBook, @PathVariable Long id) {
         return ResponseEntity.ok(bookService.replaceBook(newBook, id));
     }
 
-    @DeleteMapping("/bookstore/books/{id}")
+    @DeleteMapping("/books/{id}")
     void deleteBook(@PathVariable Long id) {
         bookService.deleteById(id);
     }

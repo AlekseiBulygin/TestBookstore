@@ -8,20 +8,38 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface BookRepository extends CrudRepository<BookEntity, Long> {
 
+    @Query("SELECT b " +
+            "FROM BookEntity b " +
+            "INNER JOIN FETCH b.shelf s " +
+            "INNER JOIN FETCH s.rack r " +
+            "WHERE b.name = ?1")
     Optional<BookEntity> findByName(String name);
 
+    @Query("SELECT b " +
+            "FROM BookEntity b " +
+            "INNER JOIN FETCH b.shelf s " +
+            "INNER JOIN FETCH s.rack r " +
+            "WHERE s.level = ?1")
     List<BookEntity> findByShelfLevel(Long shelfLevel);
 
     @Override
+    @Query("SELECT b " +
+            "FROM BookEntity b " +
+            "INNER JOIN FETCH b.shelf s " +
+            "INNER JOIN FETCH s.rack r")
     List<BookEntity> findAll();
 
-    @Query(value = "SELECT * FROM book " +
-            "INNER JOIN shelf ON shelf.id = book.shelf_id " +
-            "WHERE shelf.rack_id = ?1", nativeQuery = true)
+    @Query("SELECT b " +
+            "FROM BookEntity b " +
+            "INNER JOIN FETCH b.shelf s " +
+            "INNER JOIN FETCH s.rack r " +
+            "WHERE r.id = ?1")
     List<BookEntity> findByRackId(Long id);
 
-    @Query(value = "SELECT * FROM book " +
-            "INNER JOIN shelf ON shelf.id = book.shelf_id " +
-            "WHERE shelf.rack_id = ?1 AND shelf.level = ?2", nativeQuery = true)
+    @Query("SELECT b " +
+            "FROM BookEntity as b " +
+            "INNER JOIN FETCH b.shelf as s " +
+            "INNER JOIN FETCH s.rack as r " +
+            "WHERE r.id = ?1 AND s.level = ?2")
     List<BookEntity> findByRackIdAndShelfLevel(Long rackId, Long shelfLevel);
 }
