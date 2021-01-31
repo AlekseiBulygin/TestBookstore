@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -37,6 +38,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        LOGGER.error("HttpMissingRequestParameter: {}", ex.getLocalizedMessage().split(";")[0]);
+        return buildResponseEntity(new ApiException(status, "Malformed JSON request", ex));
+    }
+
+    @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
             HttpHeaders headers, HttpStatus status, WebRequest request) {
         LOGGER.error("HttpMessageNotReadableException: {}", ex.getLocalizedMessage().split(";")[0]);
@@ -53,6 +60,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         LOGGER.error("Validation error: {}",apiException.getFieldValidationErrors().toString());
         return buildResponseEntity(apiException);
     }
+
     private ResponseEntity<Object> buildResponseEntity(ApiException apiException) {
        return new ResponseEntity<Object>(apiException, apiException.getStatus());
     }
